@@ -1,6 +1,8 @@
 import express from "express";
 import type { Request, Response } from "express";
+import helmet from "helmet";
 import { pool } from "./config/db.js";
+import cors from "cors";
 
 import {
   getAllPokemons,
@@ -12,6 +14,23 @@ import {
 } from "./controllers/pokemons/pokemons-controllers.js";
 
 const app = express();
+
+app.use(
+  helmet({
+    hidePoweredBy: true,
+    frameguard: { action: "deny" },
+    xssFilter: true,
+    noSniff: true,
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+    referrerPolicy: { policy: "same-origin" },
+  })
+);
+// Configuration CORS
+app.use(cors());
 
 app.use(express.json());
 

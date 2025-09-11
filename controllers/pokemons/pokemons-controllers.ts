@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { pool } from "../../config/db.js";
 
-interface pokemon {
+interface Pokemon {
   name: string;
   type: string;
   hp: number;
@@ -39,6 +39,7 @@ export const getPokemonById = async (req: Request, res: Response) => {
 
     if (result.rows.length === 0) {
       res.status(404).json({ message: "no pokemon found" });
+      return;
     }
     res.status(200).json({ message: result.rows });
   } catch (error) {
@@ -48,7 +49,7 @@ export const getPokemonById = async (req: Request, res: Response) => {
 
 export const createNewPokemon = async (req: Request, res: Response) => {
   try {
-    const { name, type, hp, att, def }: pokemon = req.body;
+    const { name, type, hp, att, def }: Pokemon = req.body;
     // recherche si existant
     const foundPokemon = await pool.query(
       `SELECT * FROM pokemons WHERE name = $1`,
@@ -75,19 +76,20 @@ export const createNewPokemon = async (req: Request, res: Response) => {
 export const updatePokemon = async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
-    const { name, type, hp, att, def }: pokemon = req.body;
+    const { name, type, hp, att, def }: Pokemon = req.body;
     const result = await pool.query(
       "UPDATE pokemons SET name=$1, type=$2, hp=$3, att=$4, def=$5 WHERE id=$6  RETURNING *",
       [name, type, hp, att, def, id]
     );
     if (result.rows.length === 0) {
       res.status(404).json({ message: "cannot delete : pokemon not found" });
+      return;
     }
     res
       .status(200)
       .json({ message: "pokemon updated", pokemon: result.rows[0] });
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: (error as Error).message });
   }
 };
 
@@ -100,9 +102,10 @@ export const deletePokemon = async (req: Request, res: Response) => {
     );
     if (result.rows.length === 0) {
       res.status(404).json({ message: "cannot delete : pokemon not found" });
+      return;
     }
     res.status(200).json({ message: "pokemon deleted" });
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: (error as Error).message });
   }
 };

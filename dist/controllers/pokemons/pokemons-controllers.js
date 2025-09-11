@@ -26,6 +26,7 @@ export const getPokemonById = async (req, res) => {
         ]);
         if (result.rows.length === 0) {
             res.status(404).json({ message: "no pokemon found" });
+            return;
         }
         res.status(200).json({ message: result.rows });
     }
@@ -57,13 +58,14 @@ export const updatePokemon = async (req, res) => {
         const result = await pool.query("UPDATE pokemons SET name=$1, type=$2, hp=$3, att=$4, def=$5 WHERE id=$6  RETURNING *", [name, type, hp, att, def, id]);
         if (result.rows.length === 0) {
             res.status(404).json({ message: "cannot delete : pokemon not found" });
+            return;
         }
         res
             .status(200)
             .json({ message: "pokemon updated", pokemon: result.rows[0] });
     }
     catch (error) {
-        res.status(500).json({ error: error });
+        res.status(500).json({ error: error.message });
     }
 };
 export const deletePokemon = async (req, res) => {
@@ -72,10 +74,11 @@ export const deletePokemon = async (req, res) => {
         const result = await pool.query("DELETE FROM pokemons WHERE id=$1 RETURNING *", [id]);
         if (result.rows.length === 0) {
             res.status(404).json({ message: "cannot delete : pokemon not found" });
+            return;
         }
         res.status(200).json({ message: "pokemon deleted" });
     }
     catch (error) {
-        res.status(500).json({ error: error });
+        res.status(500).json({ error: error.message });
     }
 };
