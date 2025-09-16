@@ -18,6 +18,22 @@ export const getPokemonByType = async (req, res) => {
         res.status(500).json({ error: "Database Error" });
     }
 };
+export const getPokemonByName = async (req, res) => {
+    try {
+        const name = req.query.name;
+        if (!name) {
+            return res.status(400).json({ error: "Missing name parameter" });
+        }
+        const result = await pool.query("SELECT * FROM pokemons WHERE name ~* $1", [
+            name,
+        ]);
+        res.status(200).json({ message: result.rows });
+    }
+    catch (error) {
+        console.error("Error in getPokemonByName:", error);
+        res.status(500).json({ error: "Database Error" });
+    }
+};
 export const getPokemonById = async (req, res) => {
     try {
         const { id } = req.params;

@@ -5,6 +5,7 @@ import {
   createNewPokemon,
   updatePokemon,
   deletePokemon,
+  getPokemonByName,
 } from "./pokemons-controllers.js";
 import type { Request, Response } from "express";
 import { pool } from "../../config/db.js";
@@ -35,6 +36,54 @@ describe("getAllPokemons routes test", () => {
     jest.spyOn(pool, "query" as any).mockRejectedValue(new Error("DB down"));
 
     await getAllPokemons(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Database Error" });
+  });
+  test("getPokemonByName should return a Pokemon array when request is good", async () => {
+    const req = {
+      query: { name: "pikachu" },
+    } as unknown as Request;
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    } as unknown as Response;
+
+    jest.spyOn(pool, "query" as any).mockResolvedValue({ rows: [] });
+
+    await getPokemonByName(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ message: [] });
+  });
+  test("getPokemonByName should return a status 400 when name parameter is missing", async () => {
+    const req = {
+      query: { name: "" },
+    } as unknown as Request;
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    } as unknown as Response;
+
+    jest.spyOn(pool, "query" as any).mockResolvedValue({ rows: [] });
+    await getPokemonByName(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Missing name parameter" });
+  });
+
+  test("getPokemonByName should return s status 500 when server down", async () => {
+    const req = {
+      query: { name: "pikachu" },
+    } as unknown as Request;
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    } as unknown as Response;
+
+    jest.spyOn(pool, "query" as any).mockRejectedValue(new Error(" API Down"));
+
+    await getPokemonByName(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: "Database Error" });

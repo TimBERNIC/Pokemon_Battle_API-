@@ -2,7 +2,7 @@ import express from "express";
 import helmet from "helmet";
 import { pool } from "./config/db.js";
 import cors from "cors";
-import { getAllPokemons, getPokemonByType, getPokemonById, createNewPokemon, updatePokemon, deletePokemon, } from "./controllers/pokemons/pokemons-controllers.js";
+import { getAllPokemons, getPokemonByType, getPokemonById, createNewPokemon, updatePokemon, deletePokemon, getPokemonByName, } from "./controllers/pokemons/pokemons-controllers.js";
 const app = express();
 app.use(helmet({
     hidePoweredBy: true,
@@ -38,6 +38,7 @@ app.get("/test-db", async (req, res) => {
 //  READ
 app.get("/pokemons", getAllPokemons);
 app.get("/pokemons/types", getPokemonByType);
+app.get("/pokemon/name", getPokemonByName);
 app.get("/pokemon/:id", getPokemonById);
 //CREATE
 app.post("/pokemon", createNewPokemon);

@@ -11,6 +11,7 @@ import {
   createNewPokemon,
   updatePokemon,
   deletePokemon,
+  getPokemonByName,
 } from "./controllers/pokemons/pokemons-controllers.js";
 
 const app = express();
@@ -56,7 +57,7 @@ app.get("/test-db", async (req: Request, res: Response) => {
 app.get("/pokemons", getAllPokemons);
 
 app.get("/pokemons/types", getPokemonByType);
-
+app.get("/pokemon/name", getPokemonByName);
 app.get("/pokemon/:id", getPokemonById);
 
 //CREATE

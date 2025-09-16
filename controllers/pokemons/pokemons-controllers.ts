@@ -30,6 +30,23 @@ export const getPokemonByType = async (req: Request, res: Response) => {
   }
 };
 
+export const getPokemonByName = async (req: Request, res: Response) => {
+  try {
+    const name = req.query.name as string;
+
+    if (!name) {
+      return res.status(400).json({ error: "Missing name parameter" });
+    }
+    const result = await pool.query("SELECT * FROM pokemons WHERE name ~* $1", [
+      name,
+    ]);
+    res.status(200).json({ message: result.rows });
+  } catch (error) {
+    console.error("Error in getPokemonByName:", error);
+    res.status(500).json({ error: "Database Error" });
+  }
+};
+
 export const getPokemonById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
